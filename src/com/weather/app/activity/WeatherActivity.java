@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,7 +18,7 @@ import com.weather.app.util.HttpUtil;
 import com.weather.app.util.HttpUtil.HttpCallbackListener;
 import com.weather.app.util.Utility;
 
-public class WeatherActivity extends Activity{
+public class WeatherActivity extends Activity implements OnClickListener{
 	private TextView cityNameText;
 	private TextView publishText;
 	private TextView currentDateText;
@@ -24,6 +26,8 @@ public class WeatherActivity extends Activity{
 	private TextView temp1Text;
 	private TextView temp2Text;
 	private LinearLayout linearLayout;
+	private Button homeButton;
+	private Button updateButton;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,6 +40,10 @@ public class WeatherActivity extends Activity{
 		temp1Text=(TextView)findViewById(R.id.temp1);
 		temp2Text=(TextView)findViewById(R.id.temp2);
 		linearLayout=(LinearLayout)findViewById(R.id.linearLayout);
+		homeButton=(Button)findViewById(R.id.home);
+		updateButton=(Button)findViewById(R.id.update);
+		homeButton.setOnClickListener(this);
+		updateButton.setOnClickListener(this);
 		Intent intent=getIntent();
 		String countryCode=intent.getStringExtra("country_code");
 		if(!TextUtils.isEmpty(countryCode)){
@@ -76,7 +84,7 @@ public class WeatherActivity extends Activity{
 					String []array=response.split("\\|");
 					if(array!=null&&array.length==2){
 					String weatherCode=array[1];
-					System.out.println(weatherCode);
+					
 					queryWeatherInfo(weatherCode);
 					}
 				
@@ -123,10 +131,36 @@ public class WeatherActivity extends Activity{
 		temp1Text.setText(preference.getString("temp1", ""));
 		temp2Text.setText(preference.getString("temp2", ""));
 		weatherInfoText.setText(preference.getString("weather_desp", ""));
-		publishText.setText("今天"+preference.getString("publish_time", "")+"发布");
+//		publishText.setText("今天"+preference.getString("publish_time", "")+"发布");
+		publishText.setText("30分钟前发布");
 		currentDateText.setText(preference.getString("current_date", ""));
 		linearLayout.setVisibility(View.VISIBLE);
 		cityNameText.setVisibility(View.VISIBLE);
+	}
+
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.home:
+			Intent intent=new Intent();
+			intent.setClass(WeatherActivity.this , ChooseAreaActivity.class);
+			intent.putExtra("isFromWeatherActivity", true);
+			startActivity(intent);
+			finish();
+			
+			break;
+		case R.id.update:
+			SharedPreferences preference=PreferenceManager.getDefaultSharedPreferences(this);
+			String weatherCode=preference.getString("weather_code", "");
+			if(!TextUtils.isEmpty(weatherCode)){
+			queryWeatherInfo(weatherCode);
+			}
+			break;
+		default:
+			break;
+		}
+		
 	}
 	
 	
