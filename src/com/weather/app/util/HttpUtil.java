@@ -15,6 +15,7 @@ public class HttpUtil {
 			public void run() {
 					
 				HttpURLConnection connection=null;
+				
 				try {
 					URL url= new URL(address);
 					connection=(HttpURLConnection)url.openConnection();
@@ -26,11 +27,13 @@ public class HttpUtil {
 					
 					BufferedReader buffer=new BufferedReader(new InputStreamReader(connection.getInputStream()));
 					String line;
-					
 				
+					
 					while((line=buffer.readLine())!=null){
 						response.append(line);
+						
 					}
+					
 					
 				if(listener!=null){
 					listener.finish(response.toString());
